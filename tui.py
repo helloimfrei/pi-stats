@@ -3,6 +3,7 @@ from collections import deque
 
 import httpx
 from textual.app import App, ComposeResult
+from textual.containers import VerticalScroll
 from textual.widgets import Footer, Sparkline, Static, TabbedContent, TabPane
 
 SERVER_URL = sys.argv[1] if len(sys.argv) > 1 else "http://bazzite.local:8000"
@@ -86,6 +87,9 @@ class StatsApp(App):
         color: {ACCENT};
         background: {BG};
     }}
+    VerticalScroll {{
+        background: {BG};
+    }}
     """
 
     TITLE = "pi-stats"
@@ -101,27 +105,28 @@ class StatsApp(App):
     def compose(self) -> ComposeResult:
         with TabbedContent():
             with TabPane("Overview", id="tab-overview"):
-                yield Static("waiting...", id="ov-cpu")
-                yield Sparkline([], id="ov-cpu-spark")
-                yield Static("waiting...", id="ov-ram")
-                yield Sparkline([], id="ov-ram-spark")
-                yield Static("waiting...", id="ov-gpu")
-                yield Sparkline([], id="ov-gpu-spark")
-                yield Static("", id="ov-temps")
+                with VerticalScroll():
+                    yield Static("waiting...", id="ov-cpu")
+                    yield Sparkline([], id="ov-cpu-spark")
+                    yield Static("waiting...", id="ov-gpu")
+                    yield Sparkline([], id="ov-gpu-spark")
+                    yield Static("waiting...", id="ov-ram")
+                    yield Sparkline([], id="ov-ram-spark")
+                    yield Static("", id="ov-temps")
             with TabPane("CPU"):
                 yield Static("waiting...", id="cpu")
                 yield Static("CPU %  (5 min)", classes="graph-label")
                 yield Sparkline([], id="cpu-spark")
-            with TabPane("Memory"):
-                yield Static("waiting...", id="memory")
-                yield Static("Memory %  (5 min)", classes="graph-label")
-                yield Sparkline([], id="mem-spark")
             with TabPane("GPU"):
                 yield Static("waiting...", id="gpu")
                 yield Static("GPU Util %  (5 min)", classes="graph-label")
                 yield Sparkline([], id="gpu-spark")
                 yield Static("GPU Temp °C  (5 min)", classes="graph-label")
                 yield Sparkline([], id="gpu-temp-spark")
+            with TabPane("Memory"):
+                yield Static("waiting...", id="memory")
+                yield Static("Memory %  (5 min)", classes="graph-label")
+                yield Sparkline([], id="mem-spark")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -189,9 +194,13 @@ class StatsApp(App):
         )
 
         # --- CPU tab ---
+        cores = cpu["per_core"]
         per_core = "\n".join(
-            f"  [{ACCENT}]Core {i:<2}[/]  {_bar(p)}"
-            for i, p in enumerate(cpu["per_core"])
+            "  " + "  ".join(
+                f"[{ACCENT}]C{i:<2}[/] {_mini_bar(cores[i])}"
+                for i in range(row, min(row + 8, len(cores)))
+            )
+            for row in range(0, len(cores), 8)
         )
         self.query_one("#cpu", Static).update(
             f"\n"
@@ -261,6 +270,12 @@ def _temp_color(temp: float) -> str:
     if temp >= 60:
         return WARM
     return FG
+
+
+def _mini_bar(percent: float, width: int = 6) -> str:
+    filled = int(width * percent / 100)
+    empty = width - filled
+    return f"[{FG}]{'█' * filled}[/][{EMPTY}]{'░' * empty}[/] [{ACCENT}]{percent:>3.0f}%[/]"
 
 
 def _bar(percent: float, width: int = 20) -> str:
