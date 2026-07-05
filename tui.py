@@ -90,6 +90,29 @@ class StatsApp(App):
     VerticalScroll {{
         background: {BG};
     }}
+    ScrollBar {{
+        background: {BG};
+    }}
+    ScrollBar > .scrollbar--bar {{
+        color: {ACCENT};
+        background: {EMPTY};
+    }}
+    ScrollBar > .scrollbar--bar:hover {{
+        color: {FG};
+    }}
+    Footer {{
+        background: {BG};
+        color: {ACCENT};
+        border-top: solid {ACCENT};
+    }}
+    Footer > .footer--key {{
+        background: {ACCENT};
+        color: {BG};
+    }}
+    Footer > .footer--highlight {{
+        background: {FG};
+        color: {BG};
+    }}
     """
 
     TITLE = "pi-stats"
@@ -114,19 +137,22 @@ class StatsApp(App):
                     yield Sparkline([], id="ov-ram-spark")
                     yield Static("", id="ov-temps")
             with TabPane("CPU"):
-                yield Static("waiting...", id="cpu")
-                yield Static("CPU %  (5 min)", classes="graph-label")
-                yield Sparkline([], id="cpu-spark")
+                with VerticalScroll():
+                    yield Static("waiting...", id="cpu")
+                    yield Static("CPU %  (5 min)", classes="graph-label")
+                    yield Sparkline([], id="cpu-spark")
             with TabPane("GPU"):
-                yield Static("waiting...", id="gpu")
-                yield Static("GPU Util %  (5 min)", classes="graph-label")
-                yield Sparkline([], id="gpu-spark")
-                yield Static("GPU Temp °C  (5 min)", classes="graph-label")
-                yield Sparkline([], id="gpu-temp-spark")
+                with VerticalScroll():
+                    yield Static("waiting...", id="gpu")
+                    yield Static("GPU Util %  (5 min)", classes="graph-label")
+                    yield Sparkline([], id="gpu-spark")
+                    yield Static("GPU Temp °C  (5 min)", classes="graph-label")
+                    yield Sparkline([], id="gpu-temp-spark")
             with TabPane("Memory"):
-                yield Static("waiting...", id="memory")
-                yield Static("Memory %  (5 min)", classes="graph-label")
-                yield Sparkline([], id="mem-spark")
+                with VerticalScroll():
+                    yield Static("waiting...", id="memory")
+                    yield Static("Memory %  (5 min)", classes="graph-label")
+                    yield Sparkline([], id="mem-spark")
         yield Footer()
 
     def on_mount(self) -> None:
