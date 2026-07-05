@@ -92,9 +92,11 @@ class StatsApp(App):
     }}
     VerticalScroll {{
         scrollbar-background: {EMPTY};
+        scrollbar-background-hover: {EMPTY};
+        scrollbar-background-active: {EMPTY};
         scrollbar-color: {ACCENT};
         scrollbar-color-hover: {FG};
-        scrollbar-background-hover: {EMPTY};
+        scrollbar-color-active: {FG};
     }}
     Footer {{
         background: {BG};
