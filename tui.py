@@ -91,14 +91,16 @@ class StatsApp(App):
         background: {BG};
     }}
     ScrollBar {{
-        background: {BG};
-    }}
-    ScrollBar > .scrollbar--bar {{
-        color: {ACCENT};
         background: {EMPTY};
     }}
-    ScrollBar > .scrollbar--bar:hover {{
-        color: {FG};
+    ScrollBarThumb {{
+        background: {ACCENT};
+    }}
+    ScrollBarThumb:hover {{
+        background: {FG};
+    }}
+    ScrollBarTrack {{
+        background: {EMPTY};
     }}
     Footer {{
         background: {BG};
